@@ -464,7 +464,10 @@ export default class TypeScriptServiceClient extends Disposable implements IType
 					]
 				}
 			*/
-			this.logTelemetry('tsserver.error');
+			this.logTelemetry('tsserver.error',
+				{
+					enableRegionDiagnostics: this.configuration.enableRegionDiagnostics,
+				});
 			this.serviceExited(false, apiVersion);
 		});
 
