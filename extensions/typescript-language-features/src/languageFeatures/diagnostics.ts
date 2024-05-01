@@ -260,7 +260,7 @@ export class DiagnosticsManager extends Disposable {
 	constructor(
 		owner: string,
 		configuration: TypeScriptServiceConfiguration,
-		telemetryReporter: TelemetryReporter,
+		private readonly telemetryReporter: TelemetryReporter,
 		onCaseInsensitiveFileSystem: boolean
 	) {
 		super();
@@ -308,6 +308,7 @@ export class DiagnosticsManager extends Disposable {
 		kind: DiagnosticKind,
 		diagnostics: ReadonlyArray<vscode.Diagnostic>,
 		ranges: ReadonlyArray<vscode.Range> | undefined,
+		duration: number | undefined
 	): void {
 		let didUpdate = false;
 		const entry = this._diagnostics.get(file);
@@ -323,6 +324,8 @@ export class DiagnosticsManager extends Disposable {
 		if (didUpdate) {
 			this.scheduleDiagnosticsUpdate(file);
 		}
+
+		if (duration) this.logDiagnosticsDurationTelemetry(language, kind, diagnostics, ranges, duration);
 	}
 
 	public configFileDiagnosticsReceived(
@@ -374,5 +377,29 @@ export class DiagnosticsManager extends Disposable {
 
 	private rebuildFile(fileDiagnostic: FileDiagnostics) {
 		this._currentDiagnostics.set(fileDiagnostic.file, fileDiagnostic.getAllDiagnostics(this._settings));
+	}
+
+	private logDiagnosticsDurationTelemetry(
+		language: DiagnosticLanguage,
+		kind: DiagnosticKind,
+		diagnostics: ReadonlyArray<vscode.Diagnostic>,
+		ranges: ReadonlyArray<vscode.Range> | undefined,
+		duration: number): void {
+		this.telemetryReporter.logTelemetry('typescript.diagnostics.duration', {
+			kind: getDiagnosticsKindName(kind),
+			duration: String(duration),
+			count: String(diagnostics.length),
+			language: language === DiagnosticLanguage.TypeScript ? 'typescript' : 'javascript',
+			range: ranges?.length ? ranges[ranges.length - 1].end.line - ranges[0].start.line + 1 : undefined,
+		});
+	}
+}
+
+function getDiagnosticsKindName(kind: DiagnosticKind): string {
+	switch (kind) {
+		case DiagnosticKind.Syntax: return 'syntax';
+		case DiagnosticKind.Semantic: return 'semantic';
+		case DiagnosticKind.Suggestion: return 'suggestion';
+		case DiagnosticKind.RegionSemantic: return 'regionSemantic';
 	}
 }

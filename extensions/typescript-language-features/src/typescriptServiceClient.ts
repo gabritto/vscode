@@ -38,6 +38,7 @@ export interface TsDiagnostics {
 	readonly resource: vscode.Uri;
 	readonly diagnostics: Proto.Diagnostic[];
 	readonly spans?: Proto.TextSpan[];
+	readonly duration?: number;
 }
 
 interface ToCancelOnResourceChanged {

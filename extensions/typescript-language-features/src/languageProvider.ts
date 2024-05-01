@@ -142,7 +142,8 @@ export default class LanguageProvider extends Disposable {
 		diagnosticsKind: DiagnosticKind,
 		file: vscode.Uri,
 		diagnostics: (vscode.Diagnostic & { reportUnnecessary: any; reportDeprecated: any })[],
-		ranges: vscode.Range[] | undefined): void {
+		ranges: vscode.Range[] | undefined,
+		duration: number | undefined): void {
 		if (diagnosticsKind !== DiagnosticKind.Syntax && !this.client.hasCapabilityForResource(file, ClientCapability.Semantic)) {
 			return;
 		}
@@ -179,7 +180,7 @@ export default class LanguageProvider extends Disposable {
 				}
 			}
 			return true;
-		}), ranges);
+		}), ranges, duration);
 	}
 
 	public configFileDiagnosticsReceived(file: vscode.Uri, diagnostics: vscode.Diagnostic[]): void {
