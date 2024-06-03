@@ -11,6 +11,7 @@ import { ResourceMap } from '../utils/resourceMap';
 import { TelemetryReporter } from '../logging/telemetry';
 import { TypeScriptServiceConfiguration } from '../configuration/configuration';
 import { equals } from '../utils/objects';
+import { ITypeScriptServiceClient } from '../typescriptService';
 
 function diagnosticsEquals(a: vscode.Diagnostic, b: vscode.Diagnostic): boolean {
 	if (a === b) {
@@ -261,7 +262,8 @@ export class DiagnosticsManager extends Disposable {
 		owner: string,
 		configuration: TypeScriptServiceConfiguration,
 		telemetryReporter: TelemetryReporter,
-		onCaseInsensitiveFileSystem: boolean
+		onCaseInsensitiveFileSystem: boolean,
+		private client: ITypeScriptServiceClient,
 	) {
 		super();
 		this._diagnostics = new ResourceMap<FileDiagnostics>(undefined, { onCaseInsensitiveFileSystem });
@@ -351,6 +353,7 @@ export class DiagnosticsManager extends Disposable {
 
 	private scheduleDiagnosticsUpdate(file: vscode.Uri) {
 		if (!this._pendingUpdates.has(file)) {
+			this.client.info(`>><< Scheduling update for file ${file.fsPath} in ${this._updateDelay}ms`);
 			this._pendingUpdates.set(file, setTimeout(() => this.updateCurrentDiagnostics(file), this._updateDelay));
 		}
 	}
@@ -361,6 +364,7 @@ export class DiagnosticsManager extends Disposable {
 			this._pendingUpdates.delete(file);
 		}
 
+		this.client.info(`>><< Updating diagnostics for file ${file.fsPath}`);
 		const fileDiagnostics = this._diagnostics.get(file);
 		this._currentDiagnostics.set(file, fileDiagnostics ? fileDiagnostics.getAllDiagnostics(this._settings) : []);
 	}

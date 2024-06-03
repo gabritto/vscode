@@ -166,6 +166,7 @@ export default class LanguageProvider extends Disposable {
 		const config = vscode.workspace.getConfiguration(this.id, file);
 		const reportUnnecessary = config.get<boolean>('showUnused', true);
 		const reportDeprecated = config.get<boolean>('showDeprecated', true);
+		this.client.info(`>><< Diagnostics received for file: ${file.fsPath} kind: ${diagnosticsKind} diag count: ${diagnostics.length}`);
 		this.client.diagnosticsManager.updateDiagnostics(file, this._diagnosticLanguage, diagnosticsKind, diagnostics.filter(diag => {
 			// Don't bother reporting diagnostics we know will not be rendered
 			if (!reportUnnecessary) {

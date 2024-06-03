@@ -203,4 +203,6 @@ export interface ITypeScriptServiceClient {
 	 * Cancel on going geterr requests and re-queue them after `f` has been evaluated.
 	 */
 	interruptGetErr<R>(f: () => R): R;
+
+	info(message: string, ...data: any[]): void;
 }

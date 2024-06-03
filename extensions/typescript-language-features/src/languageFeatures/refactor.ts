@@ -541,6 +541,9 @@ class TypeScriptRefactorProvider implements vscode.CodeActionProvider<TsCodeActi
 			return undefined;
 		}
 
+		// console.log("Getting applicable refactorings, interrupting geterr");
+		// vscode.window.showInformationMessage("Getting applicable refactorings, interrupting geterr");
+		this.client.info(">><< Getting applicable refactorings, interrupting geterr");
 		const response = await this.client.interruptGetErr(() => {
 			const file = this.client.toOpenTsFilePath(document);
 			if (!file) {

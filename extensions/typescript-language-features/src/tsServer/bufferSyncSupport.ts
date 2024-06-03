@@ -344,6 +344,7 @@ class GetErrRequest {
 				else {
 					requestFiles = allFiles;
 				}
+				this.client.info(`>><< Requesting diagnostics for: ${requestFiles.join(', ')}`);
 				request = client.executeAsync('geterr', { delay: 0, files: requestFiles }, this._token.token);
 			}
 
@@ -672,6 +673,7 @@ export default class BufferSyncSupport extends Disposable {
 			return;
 		}
 
+		this.client.info(`>><< File changed: ${e.document.uri.fsPath}`);
 		this._onWillChange.fire(syncedBuffer.resource);
 
 		syncedBuffer.onContentChanged(e.contentChanges);
